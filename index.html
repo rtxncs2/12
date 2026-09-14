@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D Droid App Store</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: #f4f7fc; display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1rem; min-height: 100vh; }
+    .store-container { max-width: 1100px; width: 100%; }
+
+    .header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; gap: 1rem; }
+    .brand { display: flex; align-items: center; gap: 0.85rem; user-select: none; }
+    .brand-logo {
+      width: 52px; height: 52px; border-radius: 16px;
+      background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+      display: flex; align-items: center; justify-content: center; position: relative;
+      box-shadow: 0 8px 20px -6px rgba(15,23,42,0.45), 0 2px 6px rgba(15,23,42,0.2), inset 0 1px 1px rgba(255,255,255,0.12);
+      overflow: hidden; flex-shrink: 0;
+    }
+    .brand-logo::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(96,165,250,0.35) 0%, rgba(59,130,246,0) 55%); pointer-events: none; }
+    .brand-logo i {
+      font-size: 1.45rem;
+      background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 55%, #2563eb 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      position: relative; z-index: 1; filter: drop-shadow(0 1px 2px rgba(59,130,246,0.35));
+    }
+    .brand-text { display: flex; flex-direction: column; line-height: 1; }
+    .brand-title {
+      font-size: 1.85rem; font-weight: 800; letter-spacing: -0.7px;
+      background: linear-gradient(120deg, #0f172a 0%, #1e3a8a 45%, #3b82f6 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      display: flex; align-items: baseline; gap: 0.35rem;
+    }
+    .brand-title .store-word {
+      font-weight: 800;
+      background: linear-gradient(120deg, #3b82f6 0%, #6366f1 60%, #8b5cf6 100%);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .brand-subtitle { font-size: 0.65rem; font-weight: 600; letter-spacing: 2.2px; text-transform: uppercase; color: #94a3b8; margin-top: 0.28rem; padding-left: 1px; }
+    .brand-subtitle i { color: #f59e0b; font-size: 0.55rem; margin-right: 0.3rem; vertical-align: middle; }
+
+    .search-wrapper { position: relative; min-width: 240px; flex: 1; max-width: 340px; }
+    .search-wrapper i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.8rem; pointer-events: none; }
+    .search-wrapper input {
+      width: 100%; padding: 0.55rem 0.9rem 0.55rem 2.3rem;
+      border: none; border-radius: 40px; background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      font-size: 0.85rem; color: #0f172a; outline: 2px solid transparent; transition: all 0.2s ease;
+    }
+    .search-wrapper input:focus { outline: 2px solid #3b82f6; box-shadow: 0 6px 16px rgba(59,130,246,0.12); }
+    .search-wrapper input::placeholder { color: #94a3b8; }
+
+    .app-list { display: flex; flex-direction: column; gap: 0.4rem; width: 100%; }
+    .app-row {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      padding: 0.5rem 1rem; border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      background-color: #ffffff; gap: 0.5rem; line-height: 1.2; cursor: pointer; position: relative;
+    }
+    .app-row:hover { transform: scale(1.005); box-shadow: 0 8px 20px -6px rgba(0,0,0,0.12); filter: brightness(1.01); }
+    .app-row:active { transform: scale(0.998); }
+    .app-row::after {
+      content: '\f054'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+      font-size: 0.6rem; color: #94a3b8; position: absolute; right: 1rem; top: 50%;
+      transform: translateY(-50%); opacity: 0; transition: opacity 0.2s, transform 0.2s;
+    }
+    .app-row:hover::after { opacity: 0.6; transform: translateY(-50%) translateX(2px); }
+
+    .app-info { flex: 2 1 260px; min-width: 0; padding-right: 1.5rem; }
+    .app-name { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.1px; margin-bottom: 0.1rem; color: #0f172a; display: flex; align-items: center; gap: 0.4rem; line-height: 1.2; }
+    .app-name i { font-size: 0.8rem; opacity: 0.75; }
+    .app-description { font-size: 0.72rem; line-height: 1.3; color: #1e293b; opacity: 0.8; font-weight: 450; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+    .no-results { width: 100%; text-align: center; padding: 2rem 1.5rem; background: white; border-radius: 16px; color: #64748b; font-size: 0.9rem; font-weight: 500; box-shadow: 0 3px 10px rgba(0,0,0,0.02); }
+    .no-results i { margin-right: 0.4rem; font-size: 1rem; }
+
+    .footer { margin-top: 1.5rem; font-size: 0.75rem; color: #94a3b8; text-align: center; }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem 0.6rem; }
+      .brand-logo { width: 44px; height: 44px; border-radius: 14px; }
+      .brand-logo i { font-size: 1.15rem; }
+      .brand-title { font-size: 1.4rem; }
+      .brand-subtitle { font-size: 0.55rem; letter-spacing: 1.6px; }
+      .app-row { padding: 0.55rem 0.85rem; }
+      .app-name { font-size: 0.85rem; }
+      .app-description { font-size: 0.65rem; white-space: nowrap; }
+      .search-wrapper { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="store-container">
+    <div class="header">
+      <div class="brand">
+        <div class="brand-logo"><i class="fas fa-cube"></i></div>
+        <div class="brand-text">
+          <div class="brand-title">D Droid <span class="store-word">App Store</span></div>
+          
+        </div>
+      </div>
+      <div class="search-wrapper">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search apps..." autocomplete="off">
+      </div>
+    </div>
+
+    <div class="app-list" id="appList"></div>
+
+    <div class="footer"><span>✨ discover your next favorite app</span></div>
+  </div>
+
+  <script>
+    (function() {
+      // ============================================================
+      // 🎯 APP DATA — Edit downloadUrl for each app individually
+      // ============================================================
+      const apps = [
+        {
+          id: 'webflow-music-player',
+          name: 'Webflow Music Player',
+          developer: 'rtxncs',
+          description: 'A minimalist music player',
+          longDescription: 'A clean, lightweight music player with a focus on simplicity and beautiful design.',
+          icon: 'fa-music',
+          downloadUrl: 'https://github.com/rtxncs2/Link-Tree/releases/download/android/WaveFlow4.apk'
+        },
+        {
+          id: 'qr-maker',
+          name: 'QR Maker',
+          developer: 'rtxncs',
+          description: 'Generate QR codes instantly',
+          longDescription: 'Quickly create UPI payment QR codes for any amount and UPI ID. Share or save them with a single tap.',
+          icon: 'fa-qrcode',
+          downloadUrl: 'https://github.com/rtxncs2/Link-Tree/releases/download/Qr/URL_to_QR_Code_P_com.offline.urltoqr_V_v1.0.apk'
+        },
+        {
+          id: 'debian-to-android-file-transfer',
+          name: 'Debian to Android File Transfer',
+          developer: 'kde',
+          description: 'Transfer files seamlessly between Debian and Android',
+          longDescription: 'A simple tool to move files between your Debian Linux machine and Android device over Wi-Fi or USB.',
+          icon: 'fa-exchange-alt',
+          downloadUrl: 'https://github.com/rtxncs2/Link-Tree/releases/download/D2A/KDE_Connect_P_org.kde.kdeconnect_tp_V_v1.35.16.apk'
+        },
+        {
+          id: 'expense-manager',
+          name: 'Expense Manager',
+          developer: 'rtxncs',
+          description: 'Track your daily expenses effortlessly',
+          longDescription: 'Log income and expenses, categorize spending, and view monthly summaries to stay on top of your finances.',
+          icon: 'fa-wallet',
+          downloadUrl: 'https://github.com/rtxncs2/Link-Tree/releases/download/Exp/Expense_Manager_P_com.example.expensemanager_V_v1.0.apk'
+        },
+        {
+          id: 'simple-notes',
+          name: 'Simple Notes',
+          developer: 'rtxncs',
+          description: 'A fast, distraction-free note-taking app',
+          longDescription: 'Jot down ideas quickly with a clean interface. Supports search, categories, and local backup.',
+          icon: 'fa-sticky-note',
+          downloadUrl: 'https://github.com/rtxncs2/Link-Tree/releases/download/Notes/Notes_P_com.jerry.notes_V_v1.0.apk'
+        },
+       
+        {
+          id: 'iptv-usa',
+          name: 'IPTV USA',
+          developer: 'rtxncs',
+          description: 'Stream US TV channels on the go',
+          longDescription: 'Watch live US television channels from anywhere. Simple playlist support and fast channel switching.',
+          icon: 'fa-tv',
+          downloadUrl: 'https://github.com/rtxncs2/Link-Tree/releases/download/Ip/iptv_usa_P_com.iptv.rtx_V_v1.0.apk'
+        },
+        {
+          id: 'credits-and-debits-ledger',
+          name: 'Credits and Debits - Ledger',
+          developer: 'rtxncs',
+          description: 'Keep track of who owes you and whom you owe',
+          longDescription: 'A simple ledger to record credits and debits. Perfect for small businesses and personal lending.',
+          icon: 'fa-book',
+          downloadUrl: 'https://github.com/rtxncs2/Link-Tree/releases/download/Vv/Ledger_P_com.jerry.ledger_V_v1.0.apk'
+        },
+        {
+          id: 'simple-media-player',
+          name: 'Simple Media Player',
+          developer: 'rtxncs',
+          description: 'Play your local video and audio files',
+          longDescription: 'A lightweight media player supporting all common formats with gesture controls and subtitle support.',
+          icon: 'fa-play-circle',
+          downloadUrl: 'https://github.com/rtxncs2/Link-Tree/releases/download/Lmp/LMP_P_io.github.rtxncs2.twa_V_v1.0.0.0.apk'
+     
+       
+      
+        }
+      
+      ];
+
+      function getRandomPastelColor() {
+        const h = Math.floor(Math.random() * 360);
+        const s = Math.floor(Math.random() * 31) + 50;
+        const l = Math.floor(Math.random() * 16) + 80;
+        return `hsl(${h}, ${s}%, ${l}%)`;
+      }
+
+      const appListEl = document.getElementById('appList');
+      const searchInput = document.getElementById('searchInput');
+
+      function openAppDetail(appId) {
+        const app = apps.find(a => a.id === appId);
+        if (!app) return;
+
+        const downloadUrl = app.downloadUrl || '#';
+
+        const detailHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${app.name} – KL App Store</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: #f4f7fc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .detail-page { width: 100%; display: flex; justify-content: center; }
+    .detail-card { max-width: 720px; width: 100%; background: white; border-radius: 28px; padding: 2.5rem 2rem; box-shadow: 0 20px 40px -12px rgba(0,0,0,0.1); animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .detail-header { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .detail-icon { width: 72px; height: 72px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #0f172a; box-shadow: 0 8px 20px rgba(0,0,0,0.06); flex-shrink: 0; }
+    .detail-title { font-size: 2rem; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; line-height: 1.2; }
+    .detail-developer { font-size: 0.9rem; color: #3b82f6; font-weight: 600; margin-top: 0.35rem; }
+    .detail-description { font-size: 1.05rem; line-height: 1.7; color: #1e293b; margin-bottom: 2rem; margin-top: 0.5rem; font-weight: 450; }
+    .detail-download-btn {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border: none; padding: 1rem 2.5rem; border-radius: 60px;
+      font-weight: 700; font-size: 1.05rem; letter-spacing: 0.3px; color: white;
+      display: inline-flex; align-items: center; gap: 0.7rem; cursor: pointer;
+      box-shadow: 0 12px 24px -6px rgba(59,130,246,0.4);
+      transition: all 0.2s ease; border: 1px solid rgba(255,255,255,0.2); text-decoration: none;
+    }
+    .detail-download-btn i { font-size: 1.1rem; transition: transform 0.2s; }
+    .detail-download-btn:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); transform: translateY(-2px); box-shadow: 0 18px 30px -8px rgba(37,99,235,0.5); }
+    .detail-download-btn:hover i { transform: translateY(3px); }
+    .detail-download-btn:active { transform: translateY(0); box-shadow: 0 8px 16px -4px rgba(37,99,235,0.4); }
+    .detail-back { display: inline-flex; align-items: center; gap: 0.5rem; color: #3b82f6; text-decoration: none; font-weight: 600; font-size: 0.9rem; margin-top: 2.75rem; transition: gap 0.2s; cursor: pointer; background: none; border: none; font-family: inherit; }
+    .detail-back:hover { gap: 0.8rem; }
+    @media (max-width: 600px) { .detail-card { padding: 1.5rem 1.25rem; border-radius: 20px; } .detail-title { font-size: 1.5rem; } .detail-icon { width: 56px; height: 56px; font-size: 1.5rem; } .detail-download-btn { width: 100%; justify-content: center; padding: 0.9rem 1.5rem; font-size: 0.95rem; } }
+  </style>
+</head>
+<body>
+  <div class="detail-page">
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="detail-icon" style="background: ${getRandomPastelColor()};">
+          <i class="fas ${app.icon}"></i>
+        </div>
+        <div>
+          <div class="detail-title">${app.name}</div>
+          <div class="detail-developer">${app.developer}</div>
+        </div>
+      </div>
+      <div class="detail-description">${app.longDescription}</div>
+      <a class="detail-download-btn" href="${downloadUrl}" target="_blank" rel="noopener noreferrer">
+        <i class="fas fa-download"></i> Download Now
+      </a>
+      <button class="detail-back" onclick="window.close()">
+        <i class="fas fa-arrow-left"></i> Back to Home
+      </button>
+    </div>
+  </div>
+</body>
+</html>`;
+
+        const blob = new Blob([detailHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function renderApps(filterText = '') {
+        const query = filterText.trim().toLowerCase();
+        const filteredApps = apps.filter(app => {
+          if (!query) return true;
+          return app.name.toLowerCase().includes(query) ||
+                 app.description.toLowerCase().includes(query) ||
+                 app.developer.toLowerCase().includes(query);
+        });
+
+        appListEl.innerHTML = '';
+
+        if (filteredApps.length === 0) {
+          const noResults = document.createElement('div');
+          noResults.className = 'no-results';
+          noResults.innerHTML = '<i class="fas fa-search"></i> No apps match your search.';
+          appListEl.appendChild(noResults);
+          return;
+        }
+
+        filteredApps.forEach(app => {
+          const row = document.createElement('div');
+          row.className = 'app-row';
+          row.style.backgroundColor = getRandomPastelColor();
+          row.setAttribute('role', 'button');
+          row.setAttribute('tabindex', '0');
+          row.setAttribute('aria-label', `Open details for ${app.name}`);
+
+          const infoDiv = document.createElement('div');
+          infoDiv.className = 'app-info';
+
+          const nameDiv = document.createElement('div');
+          nameDiv.className = 'app-name';
+          const icon = document.createElement('i');
+          icon.className = `fas ${app.icon}`;
+          nameDiv.appendChild(icon);
+          nameDiv.appendChild(document.createTextNode(app.name));
+
+          const descDiv = document.createElement('div');
+          descDiv.className = 'app-description';
+          descDiv.textContent = app.description;
+
+          infoDiv.appendChild(nameDiv);
+          infoDiv.appendChild(descDiv);
+          row.appendChild(infoDiv);
+
+          row.addEventListener('click', () => openAppDetail(app.id));
+          row.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              openAppDetail(app.id);
+            }
+          });
+
+          appListEl.appendChild(row);
+        });
+      }
+
+      renderApps();
+      searchInput.addEventListener('input', (e) => renderApps(e.target.value));
+      searchInput.setAttribute('aria-label', 'Search apps by name or description');
+    })();
+  </script>
+</body>
+</html>
